@@ -1,12 +1,15 @@
 # AuthorityBadger
 
 AuthorityBadger is a lightweight plugin to manage permissions.
+
 It has not been build in the line of the authorization plugins you can usually find.
+
 The aim is to manage 'credits' or simple permission for specifics actions.
 
 ## Requirements
 
 ### Plugin
+
 has_many_polymorphs
 
 ## Install
@@ -24,7 +27,9 @@ has_many_polymorphs
 ## Example
 
 Let's say we are an online publishing company.
+
 We want to allow somebody to publish only 5 books in our website.
+
 We also want to notify people about their current credits.
 
 ### Permission model
@@ -47,16 +52,26 @@ We also want to notify people about their current credits.
 
 You can set up as much permission events as you want.
 
+
 The following options are available :
-- **about** name of the field
-- **on** active record callback
-- **from** if the value was the giving value before changed
-- **to** if the value is the giving value
-- **if** add as if condition... (Proc / Method)
-- **unless** add as unless condition... (Proc / Method)
-- **do** action triggered (Proc / Method)
+
+**about** name of the field
+
+**on** active record callback
+
+**from** if the value was the giving value before changed
+
+**to** if the value is the giving value
+
+**if** add as if condition... (Proc / Method)
+
+**unless** add as unless condition... (Proc / Method)
+
+**do** action triggered (Proc / Method)
+
 
 The acts_as_permission class method include few helpful instance methods.
+
 Have a look at the file acts_as_permission.rb in the plugin for more information.
 
 ### Set up permissions
@@ -84,9 +99,7 @@ We need a hash. We can use YML file loaded in the CONFIG var :
 
 Now you can manage your owner permissions. By default nothing is created, it's up to you to create the required permissions (next point).
 
-### How to use it?
-
-#### Manage permissions
+### Now Manage permissions
 
 ** Will create the owner's permission **
 
@@ -128,7 +141,7 @@ Now you can manage your owner permissions. By default nothing is created, it's u
 
 In any way, you are free to upgrade, downgrade, add, destroy permissions following your need.
         
-#### Methods
+### Use Methods
 
 Finally, we can use the permissions...
 
