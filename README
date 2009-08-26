@@ -1,0 +1,72 @@
+AuthorityBadger
+==========
+
+AuthorityBadger is a simple plugin to manage permission.
+
+Requirements
+============
+
+Plugin :
+has_many_polymorphs
+
+Intall
+======
+
+Create the following table :
+
+create_table :permissions do |t|
+  t.string  :name
+  t.integer :value
+  t.integer :owner_id
+  t.string  :owner_type
+  t.timestamps
+end
+
+Example
+=======
+
+Set up the 'Permission' model.
+
+class Permission < ActiveRecord::Base
+  
+  acts_as_permission
+
+  permission :about => :book_publishing, 
+             :on    => :update,
+             :do    => Proc.new { |p| p.owner.deliver_email_notification(p.owner) }
+             
+end
+
+Set up permissions.
+
+Example in a yml file :
+
+
+Set up a the permission owner.
+
+class Person < ActiveRecord::Base
+
+  has_permissions PERMISSION_CONFIG
+  
+end
+
+
+How to use the permission.
+
+# GLOBAL
+# person.create_free_writer_permissions
+# person.create_free_publisher_permissions
+# METHOD
+# method_name = 4
+# person.increment_method_name => 5
+# person.increment_method_name(2) => 7
+# person.method_name => return 7
+# person.method_name? => 7 : return false
+# person.decrement_method_name(6) => 1
+# person.method_name? => 1 : return true
+# person.method_name.between?(0, 4) => return true
+# person.method_name(-1) => -1
+# person.increment_method_name(10) => -1 (because -1 mean unlimited so it doesn't change)
+has_permissions PERMISSION_CONFIG
+
+Copyright (c) 2009 [name of plugin creator], released under the MIT license
