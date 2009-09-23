@@ -11,6 +11,8 @@ module AuthorityBadger
         
         has_many :permissions, :as => :owner
         
+        has_many :permission_uses, :through => :permissions, :source => :uses, :foreign_key => :owner_id
+        
         cattr_accessor :group_permissions
         
         self.group_permissions = group_permissions
@@ -50,8 +52,8 @@ module AuthorityBadger
           self.permissions.first(:conditions => { :name => name.to_s })
         end
         
-        def update_permission(name, value)
-          self.permission(name).update_attribute(:value, value.to_i)
+        def update_permission(name, value, options = {})
+          self.permission(name).update_value(value.to_i, options[:note] || "")
         end
         
         def permission?(name)
@@ -62,14 +64,22 @@ module AuthorityBadger
           self.permission(name).enough?
         end
         
-        def increment_permission(name, by = 1)
-          self.permission(name).increment(by)
+        def increment_permission(name, options = {})
+          self.permission(name).increment(options[:by] || 1, options[:note] || "")
         end
         
-        def decrement_permission(name, by = 1)
-          self.permission(name).decrement(by)
+        def decrement_permission(name, options = {})
+          self.permission(name).decrement(options[:by] || 1, options[:note] || "")
         end
 
+        def credit_permission(name, options = {})
+          self.increment_permission(name, options)
+        end
+        
+        def use_permission(name, options = {})
+          self.decrement_permission(name, options)
+        end
+        
         def unlimited_permission(name)
           self.permission(name).unlimited
         end

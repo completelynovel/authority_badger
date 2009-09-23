@@ -9,17 +9,34 @@ module AuthorityBadger
       def acts_as_permission
         belongs_to :owner, :polymorphic => true
         
+        has_many :uses, :class_name => 'PermissionUse'
+        
         named_scope :about, lambda { |about| { :conditions => ["permissions.name = ?", about.to_s] } }
         
         attr_accessible :name, :value, :owner
 
         validates_presence_of :name, :value, :owner
         
+        send("before_update", Proc.new { |p| p.create_permission_use })
+        
         include InstanceMethods
         extend ClassMethods
       end
       
       module InstanceMethods
+        attr_accessor :note_on_use
+        
+        def create_permission_use
+          fields = {
+            :note => self.note_on_use, 
+            :value_before => self.value_was,
+            :value_after => self.value,
+            :used_at => Time.now
+          }
+          
+          self.uses.create(fields)
+        end
+        
         def value?
           self.value == 1 || self.value == -1
         end
@@ -28,18 +45,30 @@ module AuthorityBadger
           self.value? || self.value > 0
         end
         
-        def increment(by = 1)
+        def update_value(value, note = "")
+          self.note_on_use = note
+          self.value = value
+          self.save
+        end
+        
+        def increment(by = 1, note = "")
+          self.note_on_use = note
+          
           unless self.value == -1
             value = self.value.nil? ? by : self.value += by
-            self.update_attribute(:value, value) 
+            self.value = value
+            self.save
           end
         end
         
-        def decrement(by = 1)
+        def decrement(by = 1, note = "")
+          self.note_on_use = note
+          
           unless self.value == -1
             value = self.value -= by
             value = 0 if value < 0
-            self.update_attribute(:value, value) 
+            self.value = value
+            self.save
           end
         end
         
