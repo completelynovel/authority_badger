@@ -25,10 +25,12 @@ module AuthorityBadger
       
       module InstanceMethods
         attr_accessor :note_on_use
+        attr_accessor :use_on_use
         
         def create_permission_use
           fields = {
             :note => self.note_on_use, 
+            :use => self.use_on_use,
             :value_before => self.value_was,
             :value_after => self.value,
             :used_at => Time.now
@@ -38,34 +40,43 @@ module AuthorityBadger
         end
         
         def value?
-          self.value == 1 || self.value == -1
+          self.value == -1
         end
         
         def enough?
           self.value? || self.value > 0
         end
         
-        def update_value(value, note = "")
-          self.note_on_use = note
-          self.value = value
+        def has_owner_used?(use)
+          self.uses.exists?(:use_id => use.id, :use_type => use.class.to_s)
+        end
+        
+        def update_value(value, options = {})
+          self.note_on_use = options[:note] || nil
+          self.use_on_use  = options[:use] || nil
+          self.value       = value
           self.save
         end
         
-        def increment(by = 1, note = "")
-          self.note_on_use = note
+        def increment(options = {})
+          options[:by]   ||= 1
+          self.note_on_use = options[:note] || nil
+          self.use_on_use  = options[:use] || nil
           
           unless self.value == -1
-            value = self.value.nil? ? by : self.value += by
+            value = self.value.nil? ? options[:by] : self.value += options[:by]
             self.value = value
             self.save
           end
         end
         
-        def decrement(by = 1, note = "")
-          self.note_on_use = note
+        def decrement(options = {})
+          options[:by]   ||= 1
+          self.note_on_use = options[:note] || nil
+          self.use_on_use  = options[:use] || nil
           
           unless self.value == -1
-            value = self.value -= by
+            value = self.value -= options[:by]
             value = 0 if value < 0
             self.value = value
             self.save

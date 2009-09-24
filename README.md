@@ -154,13 +154,10 @@ Finally, we can use the permissions...
     Person.first.permission(:book_publishing) #=> 7
     # Return true if more than 0 or -1 (unlimited)
     Person.first.enough_permission?(:book_publishing) #=> true
-    # Act as boolean (1 or -1 return true)
-    Person.first.permission?(:book_publishing) #=> false
     
     # A value can't be less the 0
     Person.first.decrement_permission(:book_publishing, 6) 
     Person.first.permission(:book_publishing) #=> 1
-    Person.first.permission?(:book_publishing) #=> true
     
     # Set -1, mean unlimited
     Person.first.unlimited_permission(:book_publishing)
@@ -171,6 +168,8 @@ Finally, we can use the permissions...
     
     Person.first.clear_permission(:book_publishing)
     Person.first.permission(:book_publishing) #=> 0
+
+    # Add doc for .permission => after owner user credits
     
 - [CompletelyNovel Website](http://www.completelynovel.com/ "CompletelyNovel")
 - [Find us on Github](https://github.com/completelynovel "Github")

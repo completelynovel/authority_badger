@@ -53,11 +53,11 @@ module AuthorityBadger
         end
         
         def update_permission(name, value, options = {})
-          self.permission(name).update_value(value.to_i, options[:note] || "")
+          self.permission(name).update_value(value.to_i, options)
         end
         
-        def permission?(name)
-          self.permission(name).value?
+        def permission?(name, use = nil)
+          use.present? ? self.permission(name).has_owner_used?(use) : self.permission(name).value?
         end
         
         def enough_permission?(name)
@@ -65,11 +65,11 @@ module AuthorityBadger
         end
         
         def increment_permission(name, options = {})
-          self.permission(name).increment(options[:by] || 1, options[:note] || "")
+          self.permission(name).increment(options)
         end
         
         def decrement_permission(name, options = {})
-          self.permission(name).decrement(options[:by] || 1, options[:note] || "")
+          self.permission(name).decrement(options)
         end
 
         def credit_permission(name, options = {})
