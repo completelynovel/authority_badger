@@ -1,42 +1,41 @@
 module AuthorityBadger
-  module ActsAsPermission
+  module ActsAsTokenBalance
     
     def self.included(base)
       base.extend ActMethods
     end 
 
     module ActMethods
-      def acts_as_permission
+      def acts_as_token_balance
         belongs_to :owner, :polymorphic => true
+        belongs_to :token
         
-        has_many :uses, :class_name => 'PermissionUse'
+        has_many :transactions, :class_name => 'TokenTransaction'
         
-        named_scope :about, lambda { |about| { :conditions => ["permissions.name = ?", about.to_s] } }
+        named_scope :about, lambda { |about| { :include => :tokens, :conditions => ["tokens.name = ?", about.to_s] } }
         
-        attr_accessible :name, :value, :owner
+        attr_accessible :token, :value, :owner
 
-        validates_presence_of :name, :value, :owner
+        validates_presence_of :token, :value, :owner
         
-        send("before_update", Proc.new { |p| p.create_permission_use })
+        send("before_update", Proc.new { |p| p.create_transaction })
         
         include InstanceMethods
         extend ClassMethods
       end
       
       module InstanceMethods
-        attr_accessor :note_on_use
-        attr_accessor :use_on_use
+        attr_accessor :description_on_transaction
+        attr_accessor :reference_on_transaction
         
-        def create_permission_use
-          fields = {
-            :note => self.note_on_use, 
-            :use => self.use_on_use,
-            :value_before => self.value_was,
-            :value_after => self.value,
-            :used_at => Time.now
-          }
-          
-          self.uses.create(fields)
+        def create_transaction
+          self.transactions.create({
+            :reference            => self.reference_on_transaction,
+            :token_amount_value   => self.value_was - self.value,
+            :token_balance_before => self.value_was,
+            :token_balance_after  => self.value,
+            :description          => self.description_on_transaction
+          })
         end
         
         def value?
@@ -47,21 +46,23 @@ module AuthorityBadger
           self.value? || self.value > 0
         end
         
-        def has_owner_used?(use)
-          self.uses.exists?(:use_id => use.id, :use_type => use.class.to_s)
+        def has_owner_used?(reference)
+          self.transactions.exists?(:reference_id => reference.id, :reference_type => reference.class.to_s)
         end
         
-        def update_value(value, options = {})
-          self.note_on_use = options[:note] || nil
-          self.use_on_use  = options[:use] || nil
-          self.value       = value
+        def update_balance(value, options = {})
+          self.description_on_transaction = options[:desc] || nil
+          self.reference_on_transaction   = options[:ref]  || nil
+          
+          self.value = value
           self.save
         end
         
         def increment(options = {})
-          options[:by]   ||= 1
-          self.note_on_use = options[:note] || nil
-          self.use_on_use  = options[:use] || nil
+          options[:by] ||= 1
+          
+          self.description_on_transaction = options[:desc] || nil
+          self.reference_on_transaction   = options[:ref]  || nil
           
           unless self.value == -1
             value = self.value.nil? ? options[:by] : self.value += options[:by]
@@ -71,9 +72,10 @@ module AuthorityBadger
         end
         
         def decrement(options = {})
-          options[:by]   ||= 1
-          self.note_on_use = options[:note] || nil
-          self.use_on_use  = options[:use] || nil
+          options[:by] ||= 1
+          
+          self.description_on_transaction = options[:desc] || nil
+          self.reference_on_transaction   = options[:ref]  || nil
           
           unless self.value == -1
             value = self.value -= options[:by]
@@ -107,11 +109,11 @@ module AuthorityBadger
           self.value
         end
                 
-        def trigger_permission_callback(action)
+        def trigger_token_balance_callback(action)
           action.is_a?(Proc) ? action.call(self) : self.send(action.to_s)
         end
         
-        def trigger_permission_callback?(options = {})
+        def trigger_token_balance_callback?(options = {})
           return false unless self.name == options[:about].to_s
           
           if options[:if].nil?
@@ -148,7 +150,7 @@ module AuthorityBadger
       
       module ClassMethods
         
-        def permission(options = {})
+        def balance(options = {})
           options[:about]  ||= ""
           options[:on]     ||= ""
           options[:do]     ||= ""
@@ -158,7 +160,7 @@ module AuthorityBadger
           options[:unless] ||= nil
           
           if options[:about].present? && options[:on].present? && options[:do].present?
-            send("before_#{options[:on]}", Proc.new { |p| p.trigger_permission_callback(options[:do]) }, :if => Proc.new { |p| p.trigger_permission_callback?(options) })
+            send("before_#{options[:on]}", Proc.new { |p| p.trigger_token_balance_callback(options[:do]) }, :if => Proc.new { |p| p.trigger_token_balance_callback?(options) })
           end
         end
       end

@@ -1,5 +1,7 @@
 require 'authority_badger'
 
-ActiveRecord::Base.send(:include, AuthorityBadger::ActsAsPermission)
-ActiveRecord::Base.send(:include, AuthorityBadger::ActsAsPermissionUse)
-ActiveRecord::Base.send(:include, AuthorityBadger::HasPermissions)
+ActiveRecord::Base.send(:include, AuthorityBadger::ActsAsToken)
+ActiveRecord::Base.send(:include, AuthorityBadger::ActsAsTokenBalance)
+ActiveRecord::Base.send(:include, AuthorityBadger::ActsAsTokenTransaction)
+ActiveRecord::Base.send(:include, AuthorityBadger::ActsAsTokenPrice)
+ActiveRecord::Base.send(:include, AuthorityBadger::HasTokens)

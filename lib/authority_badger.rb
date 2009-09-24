@@ -1,3 +1,5 @@
-require 'authority_badger/acts_as_permission'
-require 'authority_badger/acts_as_permission_use'
-require 'authority_badger/has_permissions'
+require 'authority_badger/acts_as_token'
+require 'authority_badger/acts_as_token_balance'
+require 'authority_badger/acts_as_token_transaction'
+require 'authority_badger/acts_as_token_price'
+require 'authority_badger/has_tokens'
