@@ -39,7 +39,7 @@ module AuthorityBadger
         def create_token(name, value)
           token = Token.find_by_name(name)
           
-          if token.present? && !self.token_balances.exists?(:token => token)
+          if token.present? && !self.token_balances.exists?(:token_id => token)
             self.token_balances.create do |tb|
               tb.token = Token.find_by_name(name)
               tb.value = value.to_i

@@ -13,6 +13,14 @@ module AuthorityBadger
         attr_accessible :name
         
         validates_presence_of :name
+        
+        include InstanceMethods
+      end
+      
+      module InstanceMethods
+        def price(currency)
+          self.prices.of_currency(currency)
+        end
       end
     end
     
