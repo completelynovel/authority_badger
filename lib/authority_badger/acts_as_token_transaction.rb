@@ -9,6 +9,8 @@ module AuthorityBadger
       def acts_as_token_transaction
         belongs_to :token_balance
         
+        has_one :token, :through => :token_balance
+        
         belongs_to :reference, :polymorphic => true
         
         attr_accessible :token_amount_value, :token_balance_before, :token_balance_after, :reference, :description

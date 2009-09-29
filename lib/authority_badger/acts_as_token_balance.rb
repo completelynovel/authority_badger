@@ -38,6 +38,10 @@ module AuthorityBadger
           })
         end
         
+        def name
+          self.token.name
+        end
+        
         def value?
           self.value == -1
         end
@@ -114,7 +118,7 @@ module AuthorityBadger
         end
         
         def trigger_token_balance_callback?(options = {})
-          return false unless self.name == options[:about].to_s
+          return false unless self.token.name == options[:about].to_s
           
           if options[:if].nil?
             if_condition = true

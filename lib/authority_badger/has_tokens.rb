@@ -62,7 +62,7 @@ module AuthorityBadger
         end
         
         def token(name)
-          self.token_balances.first(:conditions => { :name => name.to_s })
+          self.token_balances.first(:include => :token, :conditions => ["tokens.name = ?", name.to_s])
         end
         
         def token?(name, reference = nil)
