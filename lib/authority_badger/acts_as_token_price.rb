@@ -12,6 +12,7 @@ module AuthorityBadger
         belongs_to :reference, :polymorphic => true
         
         named_scope :of_currency, lambda { |name| { :conditions => ["token_prices.currency = ?", name.to_s.upcase] } }
+        named_scope :of_reference, lambda { |i| { :conditions => ["token_prices.reference_type = ? AND token_prices.reference_id = ?", i.class.to_s, i.id] } }
         
         attr_accessible :currency, :value, :reference
         
