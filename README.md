@@ -4,7 +4,7 @@ AuthorityBadger is a lightweight plugin to manage permissions.
 
 It has not been build in the line of the authorization plugins you can usually find.
 
-The aim is to manage 'credits' or simple permission for specifics actions.
+The aim is to manage simple permission using a token balance for specifics actions.
 
 ## Requirements
 
@@ -145,29 +145,36 @@ In any way, you are free to upgrade, downgrade, add, destroy permissions followi
 
 Finally, we can use the permissions...
 
-    Person.first.permission(:book_publishing) #=> 4
+    Person.first.token(:book_publishing) #=> 4
     
-    Person.first.increment_permission(:book_publishing)
-    Person.first.permission(:book_publishing) #=> 5
+    # Increment / Decrement (or Use)
+    Person.first.increment_token(:book_publishing)
+    Person.first.token(:book_publishing) #=> 5
+    Person.first.increment_token(:book_publishing, 2)
+    Person.first.token(:book_publishing) #=> 7
+    Person.first.decrement_token(:book_publishing, 3)
+    Person.first.token(:book_publishing) #=> 4
+    Person.first.use_token(:book_publishing, 1)
+    Person.first.token(:book_publishing) #=> 3
     
-    Person.first.increment_permission(:book_publishing, 2)
-    Person.first.permission(:book_publishing) #=> 7
     # Return true if more than 0 or -1 (unlimited)
-    Person.first.enough_permission?(:book_publishing) #=> true
+    Person.first.enough_token?(:book_publishing) #=> true
     
     # A value can't be less the 0
-    Person.first.decrement_permission(:book_publishing, 6) 
-    Person.first.permission(:book_publishing) #=> 1
+    Person.first.decrement_token(:book_publishing, 6) 
+    Person.first.token(:book_publishing) #=> 1
     
     # Set -1, mean unlimited
-    Person.first.unlimited_permission(:book_publishing)
-    Person.first.permission(:book_publishing) #=> -1
+    Person.first.unlimited_token(:book_publishing)
+    Person.first.token(:book_publishing) #=> -1
     
-    Person.first.reset_permission(:book_publishing)
-    Person.first.permission(:book_publishing) #=> nil
+    # Reset
+    Person.first.reset_token(:book_publishing)
+    Person.first.token(:book_publishing) #=> nil
     
-    Person.first.clear_permission(:book_publishing)
-    Person.first.permission(:book_publishing) #=> 0
+    # Clear
+    Person.first.clear_token(:book_publishing)
+    Person.first.token(:book_publishing) #=> 0
 
     # Add doc for .permission => after owner user credits
     

@@ -31,7 +31,7 @@ module AuthorityBadger
         def create_transaction
           self.transactions.create({
             :reference            => self.reference_on_transaction,
-            :token_amount_value   => self.value_was - self.value,
+            :token_amount_value   => (self.value - self.value_was).abs,
             :token_balance_before => self.value_was,
             :token_balance_after  => self.value,
             :description          => self.description_on_transaction

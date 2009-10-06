@@ -22,16 +22,42 @@ module AuthorityBadger
         end
         
         def update_tokens(tokens)
-          tokens.each do |name, token|
-            case token["action"].to_s
+          return true unless tokens.present?
+          
+          tokens.each do |name, options|
+            case options["action"].to_s
             when "create"
-              self.create_token(name token["value"])
+              if options["if"].present?
+                self.create_token(name, options["value"]) if self.send(options["if"], self.token(name), options)
+              elsif options["unless"].present?
+                self.create_token(name, options["value"]) unless !self.send(options["unless"], self.token(name), options)
+              else
+                self.create_token(name, options["value"])
+              end
             when "update"
-              self.update_token(name, token["value"])
+              if options["if"].present?
+                self.update_token(name, options["value"]) if self.send(options["if"], self.token(name), options)
+              elsif options["unless"].present?
+                self.update_token(name, options["value"]) unless !self.send(options["unless"], self.token(name), options)
+              else
+                self.update_token(name, options["value"])
+              end
             when "destroy"
-              self.token(name).destroy
+              if options["if"].present?
+                self.token(name).destroy if self.send(token["if"], self.token(name), options)
+              elsif options["unless"].present?
+                self.token(name).destroy unless !self.send(token["unless"], self.token(name), options)
+              else
+                self.token(name).destroy
+              end
             when "sum"
-              self.increment_token(name, token["value"])
+              if options["if"].present?
+                self.increment_token(name, options["value"]) if self.send(options["if"], self.token(name), options)
+              elsif options["unless"].present?
+                self.increment_token(name, options["value"]) unless !self.send(options["unless"], self.token(name), options)
+              else
+                self.increment_token(name, options["value"])
+              end
             end
           end
         end
