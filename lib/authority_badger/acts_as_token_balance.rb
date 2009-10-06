@@ -46,8 +46,8 @@ module AuthorityBadger
           self.value == -1
         end
         
-        def enough?
-          self.value? || self.value > 0
+        def enough?(value = 1)
+          self.value? || self.value >= value
         end
         
         def has_owner_used?(reference)

@@ -95,8 +95,8 @@ module AuthorityBadger
           reference.present? ? self.token(name).has_owner_used?(reference) : self.token(name).value?
         end
         
-        def enough_token?(name)
-          self.token(name).enough?
+        def enough_token?(name, value = 1)
+          self.token(name).enough?(value)
         end
         
         def increment_token(name, options = {})
