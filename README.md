@@ -14,15 +14,9 @@ has_many_polymorphs
 
 ## Install
 
-### Create the Permissions table
+### Create the required tables
 
-    create_table :permissions do |t|
-      t.string  :name
-      t.integer :value
-      t.integer :owner_id
-      t.string  :owner_type
-      t.timestamps
-    end
+    List here...
 
 ## Example
 
@@ -34,9 +28,9 @@ We also want to notify people about their current credits.
 
 ### Permission model
 
-    class Permission < ActiveRecord::Base
+    class TokenBalance < ActiveRecord::Base
   
-      acts_as_permission
+      acts_as_token_balance
 
       permission :about => :book_publishing, 
                  :on    => :create,
@@ -50,7 +44,7 @@ We also want to notify people about their current credits.
                               
     end
 
-You can set up as much permission events as you want.
+You can set up as much token balances events as you want.
 
 
 The following options are available :
@@ -70,9 +64,9 @@ The following options are available :
 **do** action triggered (Proc / Method)
 
 
-The acts_as_permission class method include few helpful instance methods.
+The acts_as_token_balance class method include few helpful instance methods.
 
-Have a look at the file acts_as_permission.rb in the plugin for more information.
+Have a look at the file acts_as_token_balance.rb in the plugin for more information.
 
 ### Set up permissions
 
@@ -93,26 +87,26 @@ We need a hash. We can use YML file loaded in the CONFIG var :
 
     class Person < ActiveRecord::Base
 
-      has_permissions PERMISSION_CONFIG
+      has_tokens
   
     end
 
-Now you can manage your owner permissions. By default nothing is created, it's up to you to create the required permissions (next point).
+Now you can manage your owner tokens. By default nothing is created, it's up to you to create the required tokens (next point).
 
 ### Now Manage permissions
 
-** Will create the owner's permission **
+** Will create the owner's token balances **
 
-    Person.find(1).create_permissions(:free_account)
-    Person.find(2).create_permissions(:advanced_account)
+    Person.find(1).create_tokens(CONFIG["free_account"])
+    Person.find(2).create_tokens(CONFIG["advanced_account"])
+    
+** Will update the owner's token balances (following the content of the YML file) **
 
-** Will update the owner's permission (following the content of the YML file) **
+    Person.find(1).update_tokens(CONFIG["free_account_to_advanced_account"])
 
-    Person.find(1).update_permissions(CONFIG["free_account_to_advanced_account"])
+** You can jump between tokens using the following actions**
 
-** You can jump between permissions using the following actions**
-
-*create* to add a new permission :
+*create* to add a new token :
 
     free_account_to_advanced_account:
       allow_people_to_comment:
@@ -139,7 +133,7 @@ Now you can manage your owner permissions. By default nothing is created, it's u
       book_publishing:
         action: destroy
 
-In any way, you are free to upgrade, downgrade, add, destroy permissions following your need.
+In any way, you are free to upgrade, downgrade, add, destroy token balances following your need.
         
 ### Use Methods
 
@@ -175,6 +169,10 @@ Finally, we can use the permissions...
     # Clear
     Person.first.clear_token(:book_publishing)
     Person.first.token(:book_publishing) #=> 0
+    
+    # After a token is used it creates a transaction, so you can check if a token has already been used :
+    # @book is the reference you used the token for
+    Person.first.used_token?(:book_publishing, @book)
 
     # Add doc for .permission => after owner user credits
     
